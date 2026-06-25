@@ -326,9 +326,44 @@ Changes flow through three locations. Always follow this order:
 ```bash
 cd /path/to/rpi-rgb-led-matrix   # local dev repo
 
+# One-time: use SSH for GitHub pushes (no HTTPS username prompt).
+git remote set-url origin git@github.com:disruptivepatternmaterial/rpi-rgb-led-matrix.git
+
 git add <changed files>
 git commit -m "your message"
 git push origin master            # pushes to your GitHub fork
+```
+
+If `git push` asks for a GitHub username/password, the remote is still HTTPS.
+Re-run the `git remote set-url ...` command above and push again.
+
+### If push is rejected (`non-fast-forward`)
+
+This means `origin/master` moved ahead and your local branch needs a rebase.
+
+```bash
+git pull --rebase origin master
+```
+
+If there are conflicts:
+
+```bash
+git status                         # see conflicted files
+# edit files and resolve conflict markers
+git add <resolved files>
+GIT_EDITOR=true git rebase --continue
+```
+
+Repeat until the rebase completes, then:
+
+```bash
+git push origin master
+```
+
+If you need to bail out and return to pre-rebase state:
+
+```bash
+git rebase --abort
 ```
 
 ### Step 2 — Deploy to the Pi
@@ -336,7 +371,8 @@ git push origin master            # pushes to your GitHub fork
 Either run the deploy script from your Mac:
 
 ```bash
-./deploy.sh
+./deploy.sh                       # default: ntableman@192.168.50.183
+# or: ./deploy.sh user@host
 ```
 
 Or SSH in and run it manually:
@@ -353,6 +389,12 @@ sudo systemctl restart rgb-panel
 systemctl status rgb-panel
 ```
 
+Quick post-deploy health check from your Mac:
+
+```bash
+ssh ntableman@192.168.50.183 "systemctl status rgb-panel --no-pager | head -20"
+```
+
 ### Step 3 — Keeping in sync with upstream (hzeller)
 
 The upstream repo (`hzeller/rpi-rgb-led-matrix`) receives regular updates.
@@ -364,6 +406,21 @@ git fetch upstream
 git merge upstream/master         # or: git rebase upstream/master
 git push origin master            # update your fork on GitHub
 # Then deploy to the Pi as above
+```
+
+### Fast return checklist (copy/paste later)
+
+```bash
+cd /path/to/rpi-rgb-led-matrix
+git status -sb
+git pull --rebase origin master
+
+# ... make changes ...
+git add <files>
+git commit -m "message"
+git push origin master
+./deploy.sh
+ssh ntableman@192.168.50.183 "systemctl status rgb-panel --no-pager | head -20"
 ```
 
 ---

@@ -169,6 +169,7 @@ Sub-Pages
 ---------
 This documentation is split into parts that help you through the process
 
+- [Build, deployment and release workflow (maintainer quickstart)](./BUILD.md)
 - <a href="wiring.md"><img src="img/wire-up-icon.png"></a>
     [**Wire up the matrix to your Pi**](./wiring.md). This document describes
     what goes where.
