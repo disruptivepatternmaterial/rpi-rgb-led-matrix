@@ -277,8 +277,12 @@ static uint32_t ReadRevisionFromProcCpuinfo() {
     fprintf(stderr, "non-existent Revision: Could not determine Pi model\n");
     return 0;
   }
+  const char *colon = index(revision_key, ':');
+  if (colon == NULL) {
+    return 0;
+  }
   unsigned int pi_revision;
-  if (sscanf(index(revision_key, ':') + 1, "%x", &pi_revision) != 1) {
+  if (sscanf(colon + 1, "%x", &pi_revision) != 1) {
     return 0;
   }
   return pi_revision;

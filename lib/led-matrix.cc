@@ -699,8 +699,9 @@ RGBMatrix *RGBMatrix::CreateFromOptions(const RGBMatrix::Options &options,
     return NULL;
   }
 
-  // For the Pi4, we might need 2, maybe up to 4. Let's open up to 5.
-  // on supported architectures, -1 will emit memory barier (DSB ST) after GPIO write
+  // For the Pi4, we might need 2, maybe up to 4. Allow up to 10 for
+  // very slow panels or unusual setups.
+  // on supported architectures, -1 will emit a memory barrier (DSB ST) after GPIO write
   if (runtime_options.gpio_slowdown < (LED_MATRIX_ALLOW_BARRIER_DELAY ? -1 : 0)
       || runtime_options.gpio_slowdown > 10) {
     fprintf(stderr, "--led-slowdown-gpio=%d is outside usable range\n",
@@ -721,6 +722,7 @@ RGBMatrix *RGBMatrix::CreateFromOptions(const RGBMatrix::Options &options,
 
   if (runtime_options.daemon > 0 && daemon(1, 0) != 0) {
     perror("Failed to become daemon");
+    return NULL;
   }
 
   RGBMatrix::Impl *result = new RGBMatrix::Impl(NULL, options);
